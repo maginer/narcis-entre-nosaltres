@@ -144,7 +144,7 @@ export function createResultView(opts: ResultOptions): ResultView {
   btnShare.hidden = !canShare;
   btnShare.addEventListener('click', async () => {
     if (!last) return;
-    const title = 'Quant de narcisista ets?';
+    const title = 'Com de narcisista ets?';
     const text = resultText(last);
     try {
       const file = cardFile(await renderCard(last));

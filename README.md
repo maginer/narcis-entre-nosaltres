@@ -1,4 +1,4 @@
-# Narcís entre nosaltres · «Quant de narcisista ets?»
+# Narcís entre nosaltres · «Com de narcisista ets?»
 
 Autotest de 21 ítems sobre el narcisisme com a **tret** de personalitat, material complementari del Treball de
 Recerca _Narcís entre nosaltres. Estudi psicològic del narcisisme i del TNP_ (INS Corbera, 2n de batxillerat,

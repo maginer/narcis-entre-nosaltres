@@ -124,7 +124,7 @@ export async function renderCard(r: Result): Promise<Blob> {
   ctx.textAlign = 'center';
   ctx.fillStyle = SOFT;
   ctx.font = `italic 400 40px ${SERIF}`;
-  ctx.fillText('Quant de narcisista ets?', W / 2, 96);
+  ctx.fillText('Com de narcisista ets?', W / 2, 96);
   ctx.fillStyle = MUTED;
   ctx.font = `400 24px ${SANS}`;
   ctx.fillText('Autotest del Treball de Recerca «Narcís entre nosaltres»', W / 2, 138);

@@ -55,7 +55,7 @@ const BANK: Record<Dim, ReadonlyArray<{ text: string; rev?: boolean }>> = {
   ],
   Exhibicionisme: [
     { text: "M'agrada ser el centre d'atenció en una festa o una reunió." },
-    { text: 'Disfruto quan la gent es fixa en mi.' },
+    { text: "M'agrada que la gent es fixi en mi." },
     { text: "Prefereixo passar desapercebut abans que cridar l'atenció.", rev: true },
   ],
   Explotació: [

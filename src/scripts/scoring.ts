@@ -53,7 +53,7 @@ export function score(answers: ReadonlyArray<number | null>, items: ReadonlyArra
 export function resultText(r: Result): string {
   const lines = r.dims.map((d) => `  ${d.dim}: ${d.pct} %`).join('\n');
   return [
-    'Autotest «Quant de narcisista ets?» (tret, no diagnòstic)',
+    'Autotest «Com de narcisista ets?» (tret, no diagnòstic)',
     `Resultat global: ${r.pct} % (${r.band.name})`,
     'Perfil per dimensions:',
     lines,
