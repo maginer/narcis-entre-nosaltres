@@ -40,6 +40,9 @@ src/
   scripts/stepper.ts     el qüestionari, una pregunta per pantalla
   scripts/result.ts      la pantalla de resultat
   scripts/radar.ts       el gràfic de radar (SVG)
+  scripts/card.ts        la imatge del resultat (canvas)
+  scripts/geometry.ts    geometria compartida del radar
+  scripts/dom.ts         accés segur als elements
   scripts/app.ts         l'arrencada
   components/            capçalera, hero, instruccions, test, resultat, explicacions, peu
   layouts/Base.astro     l'esquelet HTML amb les metadades
@@ -69,5 +72,7 @@ Cada push a `main` construeix el lloc i el publica a Cloudflare Pages (`maginer-
 
 ## Llicència
 
-Codi sota llicència [MIT](LICENSE). Els textos, els ítems del test i el nom del treball són de l'autor,
-Adrián Martínez Giner, i es poden citar amb atribució per a usos educatius.
+El codi (`src/`, `scripts/`, la configuració i els workflows) és sota llicència [MIT](LICENSE). Els textos
+de la pàgina, els ítems del test i la imatge per compartir són d'Adrián Martínez Giner i es publiquen sota
+[CC BY-NC-SA 4.0](LICENSE-CONTINGUT.md): es poden citar i reutilitzar amb atribució, sense finalitat
+comercial i amb la mateixa llicència.

@@ -1,3 +1,4 @@
+import { axisPoint, labelAnchor, valuePoints } from './geometry';
 import type { Result } from './scoring';
 
 /**
@@ -31,35 +32,31 @@ async function ensureFonts(): Promise<void> {
 }
 
 function drawRadar(ctx: CanvasRenderingContext2D, r: Result, cx: number, cy: number, R: number): void {
+  const frame = { cx, cy, r: R };
   const n = r.dims.length;
-  const ang = (i: number): number => -Math.PI / 2 + (i * 2 * Math.PI) / n;
-  const pt = (i: number, rad: number): [number, number] => [cx + rad * Math.cos(ang(i)), cy + rad * Math.sin(ang(i))];
+  const trace = (points: ReadonlyArray<readonly [number, number]>): void => {
+    ctx.beginPath();
+    points.forEach(([x, y], i) => (i === 0 ? ctx.moveTo(x, y) : ctx.lineTo(x, y)));
+    ctx.closePath();
+  };
   ctx.lineWidth = 1.5;
   ctx.strokeStyle = GRID;
   for (const level of [25, 50, 75, 100]) {
-    ctx.beginPath();
-    r.dims.forEach((_, i) => {
-      const [x, y] = pt(i, (R * level) / 100);
-      if (i === 0) ctx.moveTo(x, y);
-      else ctx.lineTo(x, y);
-    });
-    ctx.closePath();
+    trace(r.dims.map((_, i) => axisPoint(frame, i, n, (R * level) / 100)));
     ctx.stroke();
   }
   r.dims.forEach((_, i) => {
-    const [x, y] = pt(i, R);
+    const [x, y] = axisPoint(frame, i, n, R);
     ctx.beginPath();
     ctx.moveTo(cx, cy);
     ctx.lineTo(x, y);
     ctx.stroke();
   });
-  ctx.beginPath();
-  r.dims.forEach((d, i) => {
-    const [x, y] = pt(i, (R * d.pct) / 100);
-    if (i === 0) ctx.moveTo(x, y);
-    else ctx.lineTo(x, y);
-  });
-  ctx.closePath();
+  const values = valuePoints(
+    frame,
+    r.dims.map((d) => d.pct),
+  );
+  trace(values);
   ctx.fillStyle = GOLD_FILL;
   ctx.fill();
   ctx.strokeStyle = GOLD;
@@ -67,8 +64,7 @@ function drawRadar(ctx: CanvasRenderingContext2D, r: Result, cx: number, cy: num
   ctx.lineJoin = 'round';
   ctx.stroke();
   ctx.fillStyle = GOLD;
-  r.dims.forEach((d, i) => {
-    const [x, y] = pt(i, (R * d.pct) / 100);
+  values.forEach(([x, y]) => {
     ctx.beginPath();
     ctx.arc(x, y, 6, 0, Math.PI * 2);
     ctx.fill();
@@ -76,9 +72,9 @@ function drawRadar(ctx: CanvasRenderingContext2D, r: Result, cx: number, cy: num
   ctx.fillStyle = MUTED;
   ctx.font = `500 24px ${SANS}`;
   r.dims.forEach((d, i) => {
-    const [x, y] = pt(i, R + 40);
-    const c = Math.cos(ang(i));
-    ctx.textAlign = Math.abs(c) < 0.2 ? 'center' : c > 0 ? 'left' : 'right';
+    const [x, y] = axisPoint(frame, i, n, R + 40);
+    const anchor = labelAnchor(i, n);
+    ctx.textAlign = anchor === 'middle' ? 'center' : anchor === 'start' ? 'left' : 'right';
     ctx.fillText(d.dim, x, y + 8);
   });
 }

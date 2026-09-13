@@ -1,6 +1,7 @@
 import { DIM_HELP } from '../data/items';
-import { all, byId } from './dom';
 import { cardFile, downloadCard, renderCard } from './card';
+import { all, byId } from './dom';
+import { easeOutCubic } from './geometry';
 import { drawRadar } from './radar';
 import { resultText, type Result } from './scoring';
 
@@ -10,12 +11,13 @@ export interface ResultOptions {
 
 export interface ResultView {
   show(r: Result): void;
+  /** Torna a portar la vista al resultat ja calculat, sense repetir res. */
+  reveal(): void;
   hide(): void;
   onReset(handler: () => void): void;
 }
 
 const COUNT_MS = 1100;
-const easeOut = (k: number): number => 1 - Math.pow(1 - k, 3);
 
 /** La pantalla de resultat: percentatge, banda, radar, dimensions i accions. */
 export function createResultView(opts: ResultOptions): ResultView {
@@ -24,9 +26,9 @@ export function createResultView(opts: ResultOptions): ResultView {
   const band = byId('band');
   const bandText = byId('bandtext');
   const bandLabels = all<HTMLSpanElement>('#bandlabels span');
-  const marker = byId('marker');
+  const marker = byId<HTMLElement>('marker');
   const dims = byId('dims');
-  const radar = byId<HTMLElement>('radar') as unknown as SVGSVGElement;
+  const radar = byId<SVGSVGElement>('radar');
   const note = byId('note');
   const btnImage = byId<HTMLButtonElement>('btn-image');
   const btnShare = byId<HTMLButtonElement>('btn-share');
@@ -36,6 +38,7 @@ export function createResultView(opts: ResultOptions): ResultView {
 
   let last: Result | null = null;
   let resetHandler: () => void = () => {};
+  let generation = 0;
 
   const later = (f: () => void): void => {
     if (opts.reduce) f();
@@ -46,15 +49,16 @@ export function createResultView(opts: ResultOptions): ResultView {
     pct.innerHTML = `${v}<small>%</small>`;
   }
 
-  function countUp(to: number): void {
+  function countUp(to: number, mine: number): void {
     if (opts.reduce) {
       paintPct(to);
       return;
     }
     const t0 = performance.now();
     const tick = (now: number): void => {
+      if (mine !== generation) return;
       const k = Math.min(1, (now - t0) / COUNT_MS);
-      paintPct(Math.round(to * easeOut(k)));
+      paintPct(Math.round(to * easeOutCubic(k)));
       if (k < 1) requestAnimationFrame(tick);
     };
     requestAnimationFrame(tick);
@@ -86,11 +90,16 @@ export function createResultView(opts: ResultOptions): ResultView {
     });
   }
 
+  function scrollTo(el: HTMLElement): void {
+    el.scrollIntoView({ behavior: opts.reduce ? 'auto' : 'smooth', block: 'start' });
+  }
+
   function show(r: Result): void {
     last = r;
+    const mine = ++generation;
     section.classList.remove('hidden');
     section.classList.add('show');
-    countUp(r.pct);
+    countUp(r.pct, mine);
     band.textContent = r.band.name;
     bandText.textContent = r.band.text;
     bandLabels.forEach((s, i) => s.classList.toggle('on', i === r.bandIndex));
@@ -100,14 +109,25 @@ export function createResultView(opts: ResultOptions): ResultView {
     renderDims(r);
     drawRadar(radar, r.dims, !opts.reduce);
     note.textContent = '';
-    section.scrollIntoView({ behavior: opts.reduce ? 'auto' : 'smooth', block: 'start' });
+    scrollTo(section);
+    section.focus({ preventScroll: true });
+  }
+
+  function reveal(): void {
+    if (!last) return;
+    scrollTo(section);
+    section.focus({ preventScroll: true });
   }
 
   function hide(): void {
     last = null;
+    generation++;
     section.classList.add('hidden');
     section.classList.remove('show');
   }
+
+  const describe = (e: unknown, fallback: string): string => (e instanceof Error && e.message ? e.message : fallback);
+  const isCancelled = (e: unknown): boolean => e instanceof DOMException && e.name === 'AbortError';
 
   btnImage.addEventListener('click', async () => {
     if (!last) return;
@@ -116,7 +136,7 @@ export function createResultView(opts: ResultOptions): ResultView {
       downloadCard(await renderCard(last));
       note.textContent = 'Imatge desada.';
     } catch (e) {
-      note.textContent = e instanceof Error ? e.message : "No s'ha pogut desar la imatge.";
+      note.textContent = describe(e, "No s'ha pogut desar la imatge.");
     }
   });
 
@@ -130,8 +150,9 @@ export function createResultView(opts: ResultOptions): ResultView {
       const file = cardFile(await renderCard(last));
       if (navigator.canShare?.({ files: [file] })) await navigator.share({ files: [file], title, text });
       else await navigator.share({ title, text, url: 'https://maginer.com' });
-    } catch {
-      /* l'usuari ha cancel·lat: res a fer */
+    } catch (e) {
+      if (isCancelled(e)) return;
+      note.textContent = describe(e, "No s'ha pogut compartir.");
     }
   });
 
@@ -151,11 +172,12 @@ export function createResultView(opts: ResultOptions): ResultView {
   btnReset.addEventListener('click', () => {
     hide();
     resetHandler();
-    byId('test').scrollIntoView({ behavior: opts.reduce ? 'auto' : 'smooth', block: 'start' });
+    scrollTo(byId<HTMLElement>('test'));
   });
 
   return {
     show,
+    reveal,
     hide,
     onReset(handler) {
       resetHandler = handler;

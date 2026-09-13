@@ -26,7 +26,7 @@ Dos secrets del repositori, i cap al codi:
   cap altra cosa del compte.
 - `CLOUDFLARE_ACCOUNT_ID`: identificador del compte.
 
-El CI passa `gitleaks` a cada push per assegurar que no s'hi cola cap clau.
+El CI passa `gitleaks` sobre tot l'historial a cada push (imatge oficial en Docker) per assegurar que no s'hi cola cap clau. Els commits porten l'adreça no-reply de GitHub, no cap correu personal.
 
 ## Publicar a mà
 

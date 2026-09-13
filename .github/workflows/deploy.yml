@@ -42,9 +42,13 @@ jobs:
           command: pages deploy dist --project-name=maginer-tr --branch=main --commit-dirty=true
       - name: Comprova que el lloc publicat serveix aquesta versió
         run: |
-          sleep 20
-          served=$(curl -fsSL https://maginer-tr.pages.dev/ | grep -o 'data-build="[^"]*"' | head -1)
           built=$(grep -o 'data-build="[^"]*"' dist/index.html | head -1)
-          echo "servit:    $served"
-          echo "construït: $built"
-          test -n "$built" && test "$served" = "$built"
+          test -n "$built"
+          for i in 1 2 3 4 5 6 7 8; do
+            sleep 15
+            served=$(curl -fsSL https://maginer-tr.pages.dev/ | grep -o 'data-build="[^"]*"' | head -1 || true)
+            echo "intent $i: servit=$served construït=$built"
+            [ "$served" = "$built" ] && exit 0
+          done
+          echo "Producció no serveix el build nou després de dos minuts." >&2
+          exit 1

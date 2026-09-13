@@ -10,13 +10,27 @@ const REDUCE = window.matchMedia('(prefers-reduced-motion: reduce)').matches || 
 if (REDUCE) document.documentElement.classList.add('no-anim');
 
 const result = createResultView({ reduce: REDUCE });
-const stepper = createStepper({
-  reduce: REDUCE,
-  onComplete: (answers) => result.show(score(answers)),
+let lastKey = '';
+
+function complete(answers: ReadonlyArray<number>): void {
+  // Mateixes respostes que l'últim cop: només tornem al resultat, sense repetir càlcul ni animacions.
+  const key = answers.join(',');
+  if (key === lastKey) {
+    result.reveal();
+    return;
+  }
+  lastKey = key;
+  result.show(score(answers));
+}
+
+const stepper = createStepper({ reduce: REDUCE, onComplete: complete });
+result.onReset(() => {
+  lastKey = '';
+  stepper.reset();
+  stepper.focus();
 });
-result.onReset(() => stepper.reset());
 
 if (DEMO) {
   stepper.fill(DEMO_ANSWERS);
-  result.show(score(DEMO_ANSWERS));
+  complete(DEMO_ANSWERS);
 }

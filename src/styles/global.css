@@ -2,7 +2,7 @@
 :root {
   --pool: #14202b; /* fons fosc del resultat: l'estany */
   --ink: #1b2430; /* text */
-  --muted: #5f6b74;
+  --muted: #55616a;
   --line: #d3d9d8;
   --mist: #eef1f0; /* fons de la pàgina */
   --paper: #ffffff;
@@ -538,6 +538,9 @@ kbd {
   height: 120%;
   background: radial-gradient(60% 50% at 50% 40%, rgba(216, 182, 90, 0.14), transparent 70%);
   pointer-events: none;
+}
+.result:focus {
+  outline: none;
 }
 .result .wrap {
   position: relative;

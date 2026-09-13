@@ -11,9 +11,13 @@ export interface StepperOptions {
 export interface Stepper {
   reset(): void;
   fill(answers: ReadonlyArray<number>): void;
+  /** Porta el focus a la pregunta actual (després de reiniciar). */
+  focus(): void;
 }
 
 const ADVANCE_DELAY_MS = 320;
+
+type Direction = 'next' | 'prev' | 'none';
 
 /** Una pregunta per pantalla, amb teclat, punts de navegació i validació de les que falten. */
 export function createStepper(opts: StepperOptions): Stepper {
@@ -24,9 +28,9 @@ export function createStepper(opts: StepperOptions): Stepper {
   const dots = byId<HTMLDivElement>('dots');
   const pcount = byId('pcount');
   const pdone = byId('pdone');
-  const pfill = byId('pfill');
+  const pfill = byId<HTMLElement>('pfill');
+  const topfill = byId<HTMLElement>('topfill');
   const alert = byId('alert');
-  const topfill = byId('topfill');
 
   let answers: ReadonlyArray<number | null> = Array.from({ length: N_ITEMS }, () => null);
   let cur = 0;
@@ -41,7 +45,7 @@ export function createStepper(opts: StepperOptions): Stepper {
   });
   const dotButtons = all<HTMLButtonElement>('button', dots);
 
-  function render(direction: 'next' | 'prev' | 'none' = 'none'): void {
+  function render(direction: Direction = 'none'): void {
     const item = ITEMS[cur]!;
     stmt.textContent = item.text;
     stmt.classList.remove('enter-next', 'enter-prev');
@@ -50,14 +54,23 @@ export function createStepper(opts: StepperOptions): Stepper {
       stmt.classList.add(direction === 'next' ? 'enter-next' : 'enter-prev');
     }
     const done = answers.filter((a) => a !== null).length;
+    const pct = `${(100 * done) / N_ITEMS}%`;
     pcount.textContent = `Pregunta ${cur + 1} de ${N_ITEMS}`;
     pdone.textContent = done === 1 ? '1 resposta' : `${done} respostes`;
-    pfill.style.width = `${(100 * done) / N_ITEMS}%`;
-    topfill.style.width = `${(100 * done) / N_ITEMS}%`;
-    scaleButtons.forEach((b) => b.setAttribute('aria-checked', String(answers[cur] === Number(b.dataset.v))));
+    pfill.style.width = pct;
+    topfill.style.width = pct;
+    // Grup de ràdio amb focus itinerant: només l'opció triada (o la primera) entra amb Tab.
+    const checked = answers[cur];
+    scaleButtons.forEach((b, i) => {
+      const isChecked = checked === Number(b.dataset.v);
+      b.setAttribute('aria-checked', String(isChecked));
+      b.tabIndex = isChecked || (checked === null && i === 0) ? 0 : -1;
+    });
     dotButtons.forEach((b, i) => {
       b.classList.toggle('done', answers[i] !== null);
       b.classList.toggle('cur', i === cur);
+      if (i === cur) b.setAttribute('aria-current', 'step');
+      else b.removeAttribute('aria-current');
     });
     prev.disabled = cur === 0;
     const isLast = cur === N_ITEMS - 1;
@@ -68,12 +81,13 @@ export function createStepper(opts: StepperOptions): Stepper {
   function go(i: number): void {
     window.clearTimeout(advanceTimer);
     const target = Math.max(0, Math.min(N_ITEMS - 1, i));
-    const direction = target > cur ? 'next' : target < cur ? 'prev' : 'none';
+    const direction: Direction = target > cur ? 'next' : target < cur ? 'prev' : 'none';
     cur = target;
     render(direction);
   }
 
-  function answer(v: number): void {
+  /** Registra la resposta; amb `advance`, passa sola a la pregunta següent al cap d'un moment. */
+  function answer(v: number, advance: boolean): void {
     answers = answers.map((a, i) => (i === cur ? v : a));
     dotButtons[cur]?.classList.remove('miss');
     alert.textContent = '';
@@ -84,7 +98,7 @@ export function createStepper(opts: StepperOptions): Stepper {
       void picked.offsetWidth;
       picked.classList.add('picked');
     }
-    if (cur < N_ITEMS - 1) {
+    if (advance && cur < N_ITEMS - 1) {
       window.clearTimeout(advanceTimer);
       advanceTimer = window.setTimeout(() => go(cur + 1), opts.reduce ? 0 : ADVANCE_DELAY_MS);
     }
@@ -109,24 +123,43 @@ export function createStepper(opts: StepperOptions): Stepper {
     else finish();
   }
 
-  scaleButtons.forEach((b) => b.addEventListener('click', () => answer(Number(b.dataset.v))));
+  /** Fletxes dins del grup de ràdio: mouen el focus i trien l'opció, sense avançar de pregunta. */
+  function moveWithinScale(from: HTMLButtonElement, delta: number): void {
+    const i = scaleButtons.indexOf(from);
+    const target = scaleButtons[(i + delta + scaleButtons.length) % scaleButtons.length]!;
+    answer(Number(target.dataset.v), false);
+    target.focus();
+  }
+
+  scaleButtons.forEach((b) => b.addEventListener('click', () => answer(Number(b.dataset.v), true)));
   prev.addEventListener('click', () => go(cur - 1));
   next.addEventListener('click', onNext);
   document.addEventListener('keydown', (e) => {
     const target = e.target as HTMLElement | null;
-    if (target?.matches('input, textarea') || e.metaKey || e.ctrlKey || e.altKey) return;
+    if (!target || target.matches('input, textarea') || e.metaKey || e.ctrlKey || e.altKey) return;
+    const inScale = target instanceof HTMLButtonElement && scaleButtons.includes(target);
     if (e.key >= '1' && e.key <= '5') {
-      answer(Number(e.key));
+      answer(Number(e.key), true);
+      e.preventDefault();
+    } else if (inScale && (e.key === 'ArrowRight' || e.key === 'ArrowDown')) {
+      moveWithinScale(target, 1);
+      e.preventDefault();
+    } else if (inScale && (e.key === 'ArrowLeft' || e.key === 'ArrowUp')) {
+      moveWithinScale(target, -1);
       e.preventDefault();
     } else if (e.key === 'ArrowRight') go(cur + 1);
     else if (e.key === 'ArrowLeft') go(cur - 1);
-    else if (e.key === 'Enter' && document.activeElement?.closest('#test')) onNext();
+    else if (e.key === 'Enter' && target.closest('#test')) {
+      onNext();
+      e.preventDefault();
+    }
   });
 
   render();
 
   return {
     reset() {
+      window.clearTimeout(advanceTimer);
       answers = Array.from({ length: N_ITEMS }, () => null);
       cur = 0;
       dotButtons.forEach((b) => b.classList.remove('miss'));
@@ -134,9 +167,15 @@ export function createStepper(opts: StepperOptions): Stepper {
       render();
     },
     fill(values) {
-      answers = values.slice(0, N_ITEMS);
+      if (values.length !== N_ITEMS || values.some((v) => !Number.isInteger(v) || v < 1 || v > 5)) {
+        throw new Error(`Calen ${N_ITEMS} respostes d'1 a 5.`);
+      }
+      answers = [...values];
       cur = N_ITEMS - 1;
       render();
+    },
+    focus() {
+      scaleButtons.find((b) => b.tabIndex === 0)?.focus();
     },
   };
 }
