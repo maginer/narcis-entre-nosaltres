@@ -1,0 +1,52 @@
+name: Publica a maginer.com
+
+# Cada push a main construeix el lloc i el puja al projecte de Cloudflare Pages
+# `maginer-tr`, que serveix https://maginer.com. El token del secret només pot
+# tocar Pages (res de DNS ni d'altres zones).
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+concurrency:
+  group: deploy-main
+  cancel-in-progress: false
+
+permissions:
+  contents: read
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+        with:
+          fetch-depth: 0
+      - name: Cap secret al repositori
+        uses: gitleaks/gitleaks-action@v2
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      - uses: pnpm/action-setup@v4
+      - uses: actions/setup-node@v5
+        with:
+          node-version-file: .node-version
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm check
+      - run: pnpm test
+      - run: pnpm build
+      - name: Publica a Cloudflare Pages
+        uses: cloudflare/wrangler-action@v3
+        with:
+          apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+          command: pages deploy dist --project-name=maginer-tr --branch=main --commit-dirty=true
+      - name: Comprova que el lloc publicat serveix aquesta versió
+        run: |
+          sleep 20
+          served=$(curl -fsSL https://maginer-tr.pages.dev/ | grep -o 'data-build="[^"]*"' | head -1)
+          built=$(grep -o 'data-build="[^"]*"' dist/index.html | head -1)
+          echo "servit:    $served"
+          echo "construït: $built"
+          test -n "$built" && test "$served" = "$built"

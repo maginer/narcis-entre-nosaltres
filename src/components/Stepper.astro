@@ -1,0 +1,32 @@
+---
+import { N_ITEMS } from '../data/items';
+// El qüestionari, una pregunta per pantalla. La lògica viu a `src/scripts/stepper.ts`.
+---
+
+<section class="test" id="test" aria-label="Qüestionari">
+  <div class="stepper">
+    <div class="progress">
+      <span id="pcount">Pregunta 1 de {N_ITEMS}</span>
+      <div class="track"><i id="pfill"></i></div>
+      <span id="pdone">0 respostes</span>
+    </div>
+    <p class="statement" id="stmt" aria-live="polite"></p>
+    <div class="scale" role="radiogroup" aria-labelledby="stmt" id="scale">
+      {
+        [1, 2, 3, 4, 5].map((v) => (
+          <button type="button" role="radio" aria-checked="false" data-v={v}>
+            {v}
+          </button>
+        ))
+      }
+    </div>
+    <div class="scale-ends"><span>Gens d'acord</span><span>Totalment d'acord</span></div>
+    <div class="stepnav">
+      <button class="btn" type="button" id="prev">Enrere</button>
+      <div class="dots" id="dots" aria-label="Preguntes"></div>
+      <button class="btn" type="button" id="next">Següent</button>
+    </div>
+    <p class="hint">Pots respondre amb les tecles <kbd>1</kbd> a <kbd>5</kbd> i moure't amb les fletxes.</p>
+    <div class="alert" id="alert" role="alert"></div>
+  </div>
+</section>

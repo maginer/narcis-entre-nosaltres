@@ -1,0 +1,62 @@
+---
+import { BANDS } from '../data/items';
+// La pantalla de resultat: l'estany. Amagada fins que s'acaba el test; la pinta `src/scripts/result.ts`.
+---
+
+<section class="result hidden" id="result" aria-live="polite">
+  <div class="wrap">
+    <p class="print-only">Autotest «Quant de narcisista ets?» (tret, no diagnòstic)</p>
+    <div class="score">
+      <div>
+        <div class="pct" id="pct">0<small>%</small></div>
+        <div class="bandname" id="band"></div>
+      </div>
+      <div>
+        <p class="bandtext" id="bandtext"></p>
+        <div class="scaleband" aria-hidden="true">
+          <div class="track">
+            <div class="mean"></div>
+            <div class="marker" id="marker"></div>
+          </div>
+          <div class="labels" id="bandlabels">
+            {
+              BANDS.map((b) => (
+                <span>
+                  {b.short}
+                  <small>{b.range}</small>
+                </span>
+              ))
+            }
+          </div>
+        </div>
+        <p class="reading">
+          <strong>Com llegir-ho.</strong> En instruments d'aquest tipus, la mitjana de la població general se sol situar al
+          voltant del 40 %. Un percentatge alt vol dir trets narcisistes visibles, no un trastorn: el NPI mesura el tret,
+          i el TNP és una altra cosa, amb nou criteris propis que només es valoren clínicament.
+        </p>
+      </div>
+    </div>
+    <div class="profile">
+      <div>
+        <h2>El teu perfil</h2>
+        <svg
+          class="radar"
+          id="radar"
+          viewBox="0 0 400 340"
+          role="img"
+          aria-label="Gràfic de radar de les set dimensions"></svg>
+      </div>
+      <div>
+        <h2>Les set dimensions</h2>
+        <div id="dims"></div>
+      </div>
+    </div>
+    <div class="result-actions">
+      <button class="btn gold" type="button" id="btn-share" hidden>Comparteix</button>
+      <button class="btn gold" type="button" id="btn-copy">Copia el resultat</button>
+      <button class="btn light" type="button" id="btn-print">Imprimeix o desa en PDF</button>
+      <button class="btn light" type="button" id="btn-reset">Torna a començar</button>
+      <span class="note" id="note"></span>
+    </div>
+  </div>
+</section>

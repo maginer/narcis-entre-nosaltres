@@ -1,0 +1,15 @@
+# dependències i sortida
+node_modules/
+dist/
+.astro/
+.wrangler/
+
+# entorn local
+.env
+.env.*
+.dev.vars
+
+# sistema i editors
+.DS_Store
+Thumbs.db
+*.log

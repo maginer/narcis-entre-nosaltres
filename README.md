@@ -1,0 +1,73 @@
+# Narcís entre nosaltres · «Quant de narcisista ets?»
+
+Autotest de 21 ítems sobre el narcisisme com a **tret** de personalitat, material complementari del Treball de
+Recerca _Narcís entre nosaltres. Estudi psicològic del narcisisme i del TNP_ (INS Corbera, 2n de batxillerat,
+curs 2026-2027). Publicat a **[maginer.com](https://maginer.com)**.
+
+No és un diagnòstic: mesura una cosa que tothom té en algun grau i no detecta el Trastorn Narcisista de la
+Personalitat, que només pot valorar un professional.
+
+## Què fa
+
+- 21 frases, tres per a cada una de les set dimensions del NPI (Raskin i Terry, 1988): autoritat,
+  autosuficiència, superioritat, exhibicionisme, explotació, vanitat i dret adquirit. Ítems propis, alguns
+  inversos, presentats intercalats i sense dir quina dimensió mesuren.
+- Una pregunta per pantalla, amb ratolí o teclat (`1` a `5`, fletxes, `Retorn`).
+- Resultat amb percentatge global, banda (baix, moderat, marcat, alt), radar de les set dimensions i perfil
+  amb barres; botons per compartir, copiar, imprimir i repetir.
+- Cap dada surt del navegador: no hi ha servidor, cookies ni analítica.
+- `?demo=1` omple el test amb un patró d'exemple i treu les animacions (captures i defensa).
+
+## Com funciona el càlcul
+
+Cada resposta val d'1 a 5; en els ítems inversos el 5 passa a valer 1. Es sumen els 21 valors, es resta el
+mínim (21) i es divideix pel recorregut (84):
+
+```
+percentatge = (suma − 21) ÷ 84 × 100
+```
+
+El mateix càlcul amb els tres ítems de cada dimensió dona el perfil. La lògica és a
+[`src/scripts/scoring.ts`](src/scripts/scoring.ts) i els tests a
+[`src/scripts/scoring.test.ts`](src/scripts/scoring.test.ts).
+
+## Estructura
+
+```
+src/
+  data/items.ts          els ítems, les dimensions i les bandes
+  scripts/scoring.ts     el càlcul (pur, amb tests)
+  scripts/stepper.ts     el qüestionari, una pregunta per pantalla
+  scripts/result.ts      la pantalla de resultat
+  scripts/radar.ts       el gràfic de radar (SVG)
+  scripts/app.ts         l'arrencada
+  components/            capçalera, hero, instruccions, test, resultat, explicacions, peu
+  layouts/Base.astro     l'esquelet HTML amb les metadades
+  pages/                 index i 404
+  styles/global.css      els estils (tokens, seccions, impressió, moviment reduït)
+public/                  favicon, robots, capçaleres de seguretat, imatge per compartir
+scripts/og/              com es genera la imatge per compartir
+docs/                    disseny i desplegament
+```
+
+## Desenvolupament
+
+Cal Node 24 i pnpm.
+
+```bash
+pnpm install
+pnpm dev        # http://localhost:4321
+pnpm test       # tests del càlcul
+pnpm check      # tipus i plantilles Astro
+pnpm build      # dist/
+```
+
+## Desplegament
+
+Cada push a `main` construeix el lloc i el publica a Cloudflare Pages (`maginer-tr`), que serveix
+`maginer.com`. Detalls a [`docs/DESPLEGAMENT.md`](docs/DESPLEGAMENT.md).
+
+## Llicència
+
+Codi sota llicència [MIT](LICENSE). Els textos, els ítems del test i el nom del treball són de l'autor,
+Adrián Martínez Giner, i es poden citar amb atribució per a usos educatius.

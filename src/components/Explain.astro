@@ -1,0 +1,67 @@
+---
+import { DIMS, DIM_HELP } from '../data/items';
+// Les dues explicacions que el resultat necessita: què és el tret i què no és, i com surt el número.
+---
+
+<section class="explain" id="tret">
+  <h2>Tret o trastorn?</h2>
+  <p class="measure">
+    Els dos conceptes s'assemblen pel nom, però no són el mateix, i confondre'ls és l'error més habitual quan es parla
+    de narcisisme. El test mesura el primer. El segon no es pot mesurar amb cap qüestionari.
+  </p>
+  <div class="compare">
+    <div>
+      <h3>El tret</h3>
+      <p>
+        Una dimensió contínua de la personalitat. Tothom en té una mica: una dosi sana forma part de l'autoestima i de
+        la confiança en un mateix. Puntuar alt vol dir que els trets es veuen, no que hi hagi cap problema.
+      </p>
+    </div>
+    <div>
+      <h3>El trastorn</h3>
+      <p>
+        Un patró rígid, estable en el temps i que fa patir, a la persona o als del seu voltant. El DSM-5-TR el defineix
+        amb nou criteris i només el pot diagnosticar un professional després d'una avaluació directa:
+      </p>
+      <ul>
+        <li>grandiositat</li>
+        <li>fantasies d'èxit il·limitat</li>
+        <li>creença de ser especial</li>
+        <li>necessitat d'admiració</li>
+        <li>dret adquirit</li>
+        <li>explotació dels altres</li>
+        <li>manca d'empatia</li>
+        <li>enveja</li>
+        <li>arrogància</li>
+      </ul>
+    </div>
+  </div>
+  <p class="measure" style="margin-top:2rem">
+    Si alguna cosa del resultat et preocupa de veritat, el pas raonable és parlar-ne amb un psicòleg, no treure'n
+    conclusions d'un test de tres minuts.
+  </p>
+</section>
+
+<section class="explain" id="calcul">
+  <h2>Com es calcula</h2>
+  <p class="measure">
+    Cada resposta val d'1 a 5. En els ítems formulats al revés (per exemple, «Prefereixo passar desapercebut abans que
+    cridar l'atenció») la puntuació s'inverteix, de manera que el 5 passa a valer 1. Es sumen els vint-i-un valors, es
+    resta el mínim possible i es divideix pel recorregut total.
+  </p>
+  <div class="formula measure">percentatge = (suma − 21) ÷ 84 × 100</div>
+  <p class="measure">
+    El mateix càlcul, fet només amb els tres ítems de cada dimensió, dona el perfil. Les set dimensions són les del NPI
+    de Raskin i Terry (1988):
+  </p>
+  <ul class="dimlist">
+    {
+      DIMS.map((d) => (
+        <li>
+          <b>{d}</b>
+          {DIM_HELP[d]}
+        </li>
+      ))
+    }
+  </ul>
+</section>

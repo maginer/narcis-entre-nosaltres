@@ -1,0 +1,4 @@
+# Dependències amb scripts d'instal·lació permesos (pnpm 11 ho demana explícitament).
+allowBuilds:
+  esbuild: true
+  workerd: true
