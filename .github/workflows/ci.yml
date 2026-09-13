@@ -12,10 +12,8 @@ jobs:
       - uses: actions/checkout@v5
         with:
           fetch-depth: 0
-      - name: Cap secret al repositori
-        uses: gitleaks/gitleaks-action@v2
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      - name: Cap secret al repositori (tot l'historial)
+        run: docker run --rm -v "$PWD:/repo" ghcr.io/gitleaks/gitleaks:v8.21.2 git /repo --exit-code 1 --no-banner --redact
 
   check:
     runs-on: ubuntu-latest
