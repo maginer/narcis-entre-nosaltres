@@ -82,6 +82,15 @@ export const ITEMS: ReadonlyArray<Item> = [0, 1, 2].flatMap((round) =>
 
 export const N_ITEMS = ITEMS.length;
 
+/** Els cinc punts de l'escala, amb l'etiqueta que es veu sota cada número. */
+export const SCALE: ReadonlyArray<{ v: number; label: string; short: string }> = [
+  { v: 1, label: "Gens d'acord", short: 'Gens' },
+  { v: 2, label: 'Poc', short: 'Poc' },
+  { v: 3, label: 'Ni sí ni no', short: 'Ni sí ni no' },
+  { v: 4, label: 'Bastant', short: 'Bastant' },
+  { v: 5, label: "Totalment d'acord", short: 'Totalment' },
+];
+
 export interface Band {
   /** Percentatge màxim inclòs en la banda. */
   max: number;

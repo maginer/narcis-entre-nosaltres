@@ -26,6 +26,7 @@ export function createStepper(opts: StepperOptions): Stepper {
   const pdone = byId('pdone');
   const pfill = byId('pfill');
   const alert = byId('alert');
+  const topfill = byId('topfill');
 
   let answers: ReadonlyArray<number | null> = Array.from({ length: N_ITEMS }, () => null);
   let cur = 0;
@@ -52,6 +53,7 @@ export function createStepper(opts: StepperOptions): Stepper {
     pcount.textContent = `Pregunta ${cur + 1} de ${N_ITEMS}`;
     pdone.textContent = done === 1 ? '1 resposta' : `${done} respostes`;
     pfill.style.width = `${(100 * done) / N_ITEMS}%`;
+    topfill.style.width = `${(100 * done) / N_ITEMS}%`;
     scaleButtons.forEach((b) => b.setAttribute('aria-checked', String(answers[cur] === Number(b.dataset.v))));
     dotButtons.forEach((b, i) => {
       b.classList.toggle('done', answers[i] !== null);
@@ -76,6 +78,12 @@ export function createStepper(opts: StepperOptions): Stepper {
     dotButtons[cur]?.classList.remove('miss');
     alert.textContent = '';
     render();
+    const picked = scaleButtons.find((b) => Number(b.dataset.v) === v);
+    if (picked && !opts.reduce) {
+      picked.classList.remove('picked');
+      void picked.offsetWidth;
+      picked.classList.add('picked');
+    }
     if (cur < N_ITEMS - 1) {
       window.clearTimeout(advanceTimer);
       advanceTimer = window.setTimeout(() => go(cur + 1), opts.reduce ? 0 : ADVANCE_DELAY_MS);

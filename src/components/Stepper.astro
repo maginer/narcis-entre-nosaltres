@@ -1,5 +1,5 @@
 ---
-import { N_ITEMS } from '../data/items';
+import { N_ITEMS, SCALE } from '../data/items';
 // El qüestionari, una pregunta per pantalla. La lògica viu a `src/scripts/stepper.ts`.
 ---
 
@@ -13,20 +13,23 @@ import { N_ITEMS } from '../data/items';
     <p class="statement" id="stmt" aria-live="polite"></p>
     <div class="scale" role="radiogroup" aria-labelledby="stmt" id="scale">
       {
-        [1, 2, 3, 4, 5].map((v) => (
-          <button type="button" role="radio" aria-checked="false" data-v={v}>
-            {v}
+        SCALE.map((s) => (
+          <button type="button" role="radio" aria-checked="false" data-v={s.v}>
+            <span class="n">{s.v}</span>
+            <span class="cap">{s.label}</span>
+            <span class="cap cap-s">{s.short}</span>
           </button>
         ))
       }
     </div>
-    <div class="scale-ends"><span>Gens d'acord</span><span>Totalment d'acord</span></div>
     <div class="stepnav">
       <button class="btn" type="button" id="prev">Enrere</button>
       <div class="dots" id="dots" aria-label="Preguntes"></div>
       <button class="btn" type="button" id="next">Següent</button>
     </div>
-    <p class="hint">Pots respondre amb les tecles <kbd>1</kbd> a <kbd>5</kbd> i moure't amb les fletxes.</p>
+    <p class="hint">
+      Tecles <kbd>1</kbd> a <kbd>5</kbd> per respondre, fletxes per moure't, <kbd>Retorn</kbd> per continuar.
+    </p>
     <div class="alert" id="alert" role="alert"></div>
   </div>
 </section>

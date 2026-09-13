@@ -1,5 +1,6 @@
 import { DIM_HELP } from '../data/items';
 import { all, byId } from './dom';
+import { cardFile, downloadCard, renderCard } from './card';
 import { drawRadar } from './radar';
 import { resultText, type Result } from './scoring';
 
@@ -27,6 +28,7 @@ export function createResultView(opts: ResultOptions): ResultView {
   const dims = byId('dims');
   const radar = byId<HTMLElement>('radar') as unknown as SVGSVGElement;
   const note = byId('note');
+  const btnImage = byId<HTMLButtonElement>('btn-image');
   const btnShare = byId<HTMLButtonElement>('btn-share');
   const btnCopy = byId<HTMLButtonElement>('btn-copy');
   const btnPrint = byId<HTMLButtonElement>('btn-print');
@@ -63,9 +65,10 @@ export function createResultView(opts: ResultOptions): ResultView {
     const hi = Math.max(...values);
     const lo = Math.min(...values);
     dims.replaceChildren(
-      ...r.dims.map((d) => {
+      ...r.dims.map((d, i) => {
         const row = document.createElement('div');
         row.className = 'dim';
+        row.style.setProperty('--i', String(i));
         const tag =
           hi !== lo && d.pct === hi
             ? '<small>la més alta</small>'
@@ -106,12 +109,27 @@ export function createResultView(opts: ResultOptions): ResultView {
     section.classList.remove('show');
   }
 
+  btnImage.addEventListener('click', async () => {
+    if (!last) return;
+    note.textContent = 'Preparant la imatge…';
+    try {
+      downloadCard(await renderCard(last));
+      note.textContent = 'Imatge desada.';
+    } catch (e) {
+      note.textContent = e instanceof Error ? e.message : "No s'ha pogut desar la imatge.";
+    }
+  });
+
   const canShare = typeof navigator.share === 'function';
   btnShare.hidden = !canShare;
   btnShare.addEventListener('click', async () => {
     if (!last) return;
+    const title = 'Quant de narcisista ets?';
+    const text = resultText(last);
     try {
-      await navigator.share({ title: 'Quant de narcisista ets?', text: resultText(last), url: 'https://maginer.com' });
+      const file = cardFile(await renderCard(last));
+      if (navigator.canShare?.({ files: [file] })) await navigator.share({ files: [file], title, text });
+      else await navigator.share({ title, text, url: 'https://maginer.com' });
     } catch {
       /* l'usuari ha cancel·lat: res a fer */
     }
