@@ -45,6 +45,7 @@ function bar(label: string, value: number, max: number, suffix: string): HTMLDiv
 function render(rows: ReadonlyArray<StoredRow>): void {
   const pcts = rows.map((r) => r.pct);
   byId('rs-count').textContent = String(rows.length);
+  byId('rs-count-label').textContent = rows.length === 1 ? 'resultat' : 'resultats';
   byId('rs-mean').textContent = rows.length ? `${mean(pcts)}%` : '–';
   byId('rs-range').textContent = rows.length ? `${Math.min(...pcts)}–${Math.max(...pcts)}%` : '–';
 
@@ -84,7 +85,9 @@ function render(rows: ReadonlyArray<StoredRow>): void {
     }),
   );
   byId('rs-status').textContent = rows.length
-    ? `${rows.length} resultats, del més recent al més antic.`
+    ? rows.length === 1
+      ? '1 resultat.'
+      : `${rows.length} resultats, del més recent al més antic.`
     : "Encara no hi ha cap resultat. Apareixeran aquí quan algú faci el test i accepti afegir-lo a l'estudi.";
 }
 
