@@ -9,12 +9,13 @@
     "dev": "astro dev",
     "build": "astro build",
     "preview": "astro preview",
-    "check": "astro check",
+    "check": "astro check && tsc -p functions",
     "test": "vitest run",
     "test:watch": "vitest",
     "deploy": "pnpm build && wrangler pages deploy dist --project-name maginer-tr --branch main",
     "format": "prettier --write .",
-    "format:check": "prettier --check ."
+    "format:check": "prettier --check .",
+    "db:migrate": "wrangler d1 execute maginer-tr-resultats --remote --file migrations/0001_resultats.sql"
   },
   "dependencies": {
     "@astrojs/sitemap": "^3.7.4",
@@ -26,6 +27,7 @@
     "vitest": "^5.0.0",
     "wrangler": "^4.131.1",
     "prettier": "^3.6.0",
-    "prettier-plugin-astro": "^0.14.1"
+    "prettier-plugin-astro": "^0.14.1",
+    "@cloudflare/workers-types": "^5.20260929.1"
   }
 }

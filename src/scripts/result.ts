@@ -15,6 +15,8 @@ export interface ResultView {
   reveal(): void;
   hide(): void;
   onReset(handler: () => void): void;
+  /** Missatge breu al costat dels botons (per exemple, si el resultat s'ha desat). */
+  setNote(text: string): void;
 }
 
 const COUNT_MS = 1100;
@@ -181,6 +183,9 @@ export function createResultView(opts: ResultOptions): ResultView {
     hide,
     onReset(handler) {
       resetHandler = handler;
+    },
+    setNote(text) {
+      note.textContent = text;
     },
   };
 }

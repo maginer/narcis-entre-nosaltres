@@ -40,5 +40,6 @@ del resultat. `prefers-reduced-motion` i `?demo=1` ho aturen tot (classe `no-ani
 
 - **Percentils o comparacions amb els cinc casos del treball.** Els casos es valoren amb els criteris del
   DSM-5-TR, no amb les dimensions del NPI; comparar-los amb el resultat seria enganyós.
-- **Guardar respostes.** Sense servidor ni emmagatzematge: la pàgina no ha de saber res de qui la fa.
+- **Guardar dades personals.** Des del 29 de setembre de 2026 es desen els resultats per a l'estudi del treball, però
+  només les respostes i el percentatge, amb una casella que qui respon pot desmarcar. Ni nom, ni correu, ni IP.
 - **Mode fosc global.** El contrast clar/fosc és el del test i el resultat; un tema fosc sencer el perdria.

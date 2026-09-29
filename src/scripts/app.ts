@@ -2,6 +2,7 @@ import { DEMO_ANSWERS } from '../data/items';
 import { createResultView } from './result';
 import { score } from './scoring';
 import { createStepper } from './stepper';
+import { submitResult } from './submit';
 
 // `?demo=1` omple el test amb un patró d'exemple i treu les animacions:
 // serveix per a les captures del treball i per ensenyar-lo a la defensa.
@@ -21,6 +22,14 @@ function complete(answers: ReadonlyArray<number>): void {
   }
   lastKey = key;
   result.show(score(answers));
+  const consent = document.getElementById('consent') as HTMLInputElement | null;
+  if (!DEMO && consent?.checked) {
+    void submitResult(answers).then((ok) =>
+      result.setNote(
+        ok ? "Resultat afegit a l'estudi de manera anònima." : "No s'ha pogut afegir el resultat a l'estudi.",
+      ),
+    );
+  }
 }
 
 const stepper = createStepper({ reduce: REDUCE, onComplete: complete });

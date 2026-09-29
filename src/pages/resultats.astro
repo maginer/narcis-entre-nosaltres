@@ -1,0 +1,74 @@
+---
+import Base from '../layouts/Base.astro';
+import { DIMS } from '../data/items';
+// Resultats anònims de l'autotest. Les dades les llegeix `src/scripts/resultats.ts` de /api/results.
+---
+
+<Base
+  title="Resultats de l'autotest · Narcís entre nosaltres"
+  description="Resultats anònims de l'autotest «Com de narcisista ets?» del Treball de Recerca «Narcís entre nosaltres»."
+  noindex
+>
+  <div class="wrap">
+    <header class="site">
+      <a class="brand" href="/">Narcís entre nosaltres</a>
+      <nav aria-label="Seccions"><a href="/#test">Fes el test</a></nav>
+    </header>
+
+    <main class="rs">
+      <h1>Resultats de l'autotest</h1>
+      <p class="measure rs-lede">
+        Resultats anònims de les persones que han fet el test i han acceptat afegir-los a l'estudi. Només es desen les
+        21 respostes i el percentatge, sense nom, correu ni IP. Es recullen des del 29 de setembre de 2026.
+      </p>
+
+      <section class="rs-summary" aria-label="Resum">
+        <div><b id="rs-count">…</b><span>resultats</span></div>
+        <div><b id="rs-mean">…</b><span>mitjana global</span></div>
+        <div><b id="rs-range">…</b><span>mínim i màxim</span></div>
+      </section>
+
+      <section class="rs-block" aria-labelledby="rs-bands-h">
+        <h2 id="rs-bands-h">Per bandes</h2>
+        <div class="rs-bands" id="rs-bands"></div>
+      </section>
+
+      <section class="rs-block" aria-labelledby="rs-dims-h">
+        <h2 id="rs-dims-h">Mitjana per dimensió</h2>
+        <div class="rs-dims" id="rs-dims"></div>
+      </section>
+
+      <section class="rs-block" aria-labelledby="rs-table-h">
+        <div class="rs-table-head">
+          <h2 id="rs-table-h">Tots els resultats</h2>
+          <div class="rs-actions">
+            <button class="btn" type="button" id="rs-reload">Actualitza</button>
+            <a class="btn primary" href="/api/results?format=csv">Descarrega CSV</a>
+          </div>
+        </div>
+        <p class="rs-status" id="rs-status" role="status">Carregant…</p>
+        <div class="rs-scroll">
+          <table class="rs-table">
+            <thead>
+              <tr>
+                <th scope="col">#</th>
+                <th scope="col">Data</th>
+                <th scope="col">Global</th>
+                <th scope="col">Banda</th>
+                {DIMS.map((d) => <th scope="col">{d}</th>)}
+              </tr>
+            </thead>
+            <tbody id="rs-body"></tbody>
+          </table>
+        </div>
+      </section>
+    </main>
+
+    <footer class="foot">
+      <p>Test orientatiu. No és un diagnòstic. Material del Treball de Recerca «Narcís entre nosaltres».</p>
+    </footer>
+  </div>
+  <script>
+    import '../scripts/resultats';
+  </script>
+</Base>

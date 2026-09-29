@@ -15,7 +15,9 @@ Personalitat, que només pot valorar un professional.
 - Una pregunta per pantalla, amb ratolí o teclat (`1` a `5`, fletxes, `Retorn`).
 - Resultat amb percentatge global, banda (baix, moderat, marcat, alt), radar de les set dimensions i perfil
   amb barres; botons per compartir, copiar, imprimir i repetir.
-- Cap dada surt del navegador: no hi ha servidor, cookies ni analítica.
+- Si qui fa el test ho accepta (casella marcada per defecte), les 21 respostes i el resultat es desen de manera
+  anònima a Cloudflare D1: sense nom, correu, IP, cookies ni analítica. El servidor refà el càlcul i no es refia
+  del navegador. Es poden consultar a [maginer.com/resultats](https://maginer.com/resultats) i descarregar en CSV.
 - `?demo=1` omple el test amb un patró d'exemple i treu les animacions (captures i defensa).
 
 ## Com funciona el càlcul
@@ -44,6 +46,11 @@ src/
   scripts/geometry.ts    geometria compartida del radar
   scripts/dom.ts         accés segur als elements
   scripts/app.ts         l'arrencada
+  scripts/submission.ts  validació i format de les respostes desades (compartit amb el servidor)
+  scripts/submit.ts      l'enviament del resultat
+  scripts/resultats.ts   la pàgina de resultats
+functions/api/results.ts Pages Function: desa (POST) i llista (GET, JSON o CSV) els resultats
+migrations/              l'esquema de la taula de D1
   components/            capçalera, hero, instruccions, test, resultat, explicacions, peu
   layouts/Base.astro     l'esquelet HTML amb les metadades
   pages/                 index i 404

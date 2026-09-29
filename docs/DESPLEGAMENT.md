@@ -18,6 +18,15 @@ l'HTML) que s'acaba de construir: «desplegat» no vol dir «servit» fins que a
 Les branques que no són `main` i els pull requests passen només les comprovacions
 ([`ci.yml`](../.github/workflows/ci.yml)), sense publicar.
 
+## Resultats (D1)
+
+Els resultats anònims es desen a la base de dades D1 `maginer-tr-resultats` (regió WEUR), enllaçada al projecte de
+Pages amb el nom `DB` des de la configuració del projecte a Cloudflare (no hi ha `wrangler.toml` al repositori).
+L'esquema és a [`migrations/0001_resultats.sql`](../migrations/0001_resultats.sql) i s'aplica amb
+`pnpm db:migrate` (cal un token amb permís de D1). La funció [`functions/api/results.ts`](../functions/api/results.ts)
+accepta `POST` només des de l'origen del lloc, valida les 21 respostes i refà el càlcul; `GET` retorna JSON o, amb
+`?format=csv`, un CSV. Una regla de límit de peticions de Cloudflare frena els enviaments massius.
+
 ## Secrets
 
 Dos secrets del repositori, i cap al codi:
