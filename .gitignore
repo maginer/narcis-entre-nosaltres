@@ -13,3 +13,6 @@ dist/
 .DS_Store
 Thumbs.db
 *.log
+
+# Claude Code: permisos locales, pueden llevar claves (no se suben nunca)
+.claude/settings.local.json
